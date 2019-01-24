@@ -1,0 +1,103 @@
+{
+    "flask_app": {
+        "BASIC_AUTH_PASSWORD": "demo",
+        "BASIC_AUTH_USERNAME": "demo",
+        "SECRET_KEY": "MySuperUltraSecret"
+    },
+    "iqr_tabs": {
+        "csift": {
+            "name": "CSIFT",
+            "working_directory": "workdir_L2Flat_ImageNet",
+	    "pos_seed_neighbors": 500,
+            "data_set": {
+                "DataMemorySet": {
+                    "file_cache": "workdir_L2Flat_ImageNet/csift/MemorySet.cache"
+                },
+                "DataFileSet": {
+                    "root_directory": "workdir_L2Flat_ImageNet/csift/DataFileSetCache",
+                    "uuid_chunk": 10
+                },
+                "type": "DataFileSet"
+            },
+            "smap_set": {
+                "DataFileSet": {
+                    "root_directory": "workdir_L2Flat_ImageNet/csift/SmapFileSetCache",
+                    "uuid_chunk": 10
+                },
+                "type": "DataFileSet"
+            },
+            "descriptor_factory": {
+                "DescriptorMemoryElement": {},
+                "type": "DescriptorMemoryElement"
+            },
+	    "descr_generator": {
+		"PytorchDescriptorGenerator": {
+		    "model_cls_name": "ImageNet_ResNet50",
+		    "model_uri": null,
+		    "resize_val": [224, 224],
+		    "batch_size": 48,
+		    "use_gpu": true
+		},
+		"PytorchSaliencyDescriptorGenerator": {
+		    "model_cls_name": "ImageNet_ResNet50",
+		    "model_uri": null,
+		    "resize_val": [224, 224],
+		    "batch_size": 512,
+		    "use_gpu": true,
+		    "mask_num": 4000,
+		    "grid_num": 13,
+		    "topk": 3,
+		    "saliency_store_uri": "workdir_L2Flat_ImageNet/csift/SmapFileSetCache"
+		},
+		"PytorchDisSaliencyDescriptorGenerator": {
+		    "model_cls_name": "ImageNet_ResNet50",
+		    "model_uri": null,
+		    "resize_val": [224, 224],
+		    "batch_size": 512,
+		    "use_gpu": true,
+		    "grid_size": 20,
+		    "stride": 4,
+		    "saliency_uuid_dict_file": "workdir_L2Flat_ImageNet/disImageNet_uuid_dict.pkl",
+		    "saliency_store_uri": "workdir_L2Flat_ImageNet/csift/SmapFileSetCache",
+		    "dis_type_str": "L2"
+		},
+
+		"type": "PytorchDescriptorGenerator"
+            },
+            "nn_index": {
+                "FlannNearestNeighborsIndex": {
+                    "index_uri": "workdir_L2Flat_ImageNet/csift/flann/index.flann",
+                    "parameters_uri": "workdir_L2Flat_ImageNet/csift/flann/index.parameters",
+                    "descriptor_cache_uri": "workdir_L2Flat_ImageNet/csift/flann/index.cache",
+                    "autotune": false,
+                    "distance_method": "euclidean",
+                    "random_seed": 42
+                },
+                "FaissNearestNeighborsIndex": {
+                    "index_uri": "workdir_L2Flat_ImageNet/csift/faiss/index.faiss",
+                    "descriptor_cache_uri": "workdir_L2Flat_ImageNet/csift/faiss/index.cache",
+                    "exhaustive": true,
+		    "index_type": "IVF100,Flat",
+		    "nprob": 10
+                },
+                "type": "FaissNearestNeighborsIndex"
+            },
+            "rel_index_config": {
+                "LibSvmHikRelevancyIndex": {
+                    "descr_cache_filepath": null,
+                    "autoneg_select_ratio": 1
+                },
+                "type": "LibSvmHikRelevancyIndex"
+            }
+        }
+    },
+    "mongo": {
+        "database": "smqtk",
+        "server": "127.0.0.1:27017"
+    },
+    "server": {
+        "host": "0.0.0.0",
+        "port": 5000
+    }
+}
+
